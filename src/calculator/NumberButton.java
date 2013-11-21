@@ -1,5 +1,7 @@
 package calculator;
 
+import java.awt.event.ActionEvent;
+
 public class NumberButton extends CalculatorButton{
     String value;
 
@@ -7,5 +9,9 @@ public class NumberButton extends CalculatorButton{
         super(calculatorChip);
         super.setText(value); // set the value of the button
         this.value = value;
+    }
+    
+    public String onClick(ActionEvent e){
+        return "";
     }
 }

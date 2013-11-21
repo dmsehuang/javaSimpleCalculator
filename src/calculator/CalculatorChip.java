@@ -1,122 +1,166 @@
 package calculator;
 
 import javax.swing.*;
+import java.lang.Math;
 import java.util.ArrayList;
-import java.lang.Math;;
 
 public class CalculatorChip {
-    // reference to the controller's text field
-    JTextField display;
-    // memory used by memory operation
     float memory; 
-    // two operand registers
-    ArrayList<Float> operandList;
-    // one operator registers
+    String numberBuffer;
+    boolean isResult; // if the display is a result, can't change it
+    ArrayList<Float> operandList; // at most two operands
     String operator;
     
     /* constructor for calculator chip */
     public CalculatorChip(){
-        this.display = null;
         this.memory = 0;
+        this.numberBuffer = "0";
+        this.isResult = false;
         this.operandList = new ArrayList<Float>();
         this.operator = null;
     }
     
-    /* clear all the numbers */
+    /* clear method */
     public String clear(){
-        return "";
+        // clear the number buffer
+        this.numberBuffer = "0";
+        return "0";
     }
     
-    /* clear all the memory */
+    /* All clear method */
+    public String allClear(){
+        // clear the number buffer, operand list and operator
+        this.numberBuffer = "0";
+        this.operandList.clear();
+        this.operator = null;
+        return "0";
+    }
+    
+    /* clear the memory */
     public String memClear(){
         this.memory = 0;
-        return "";
-    } 
+        return "0";
+    }
     
     /* read data from the memory and display it */
     public String memRead(){
-        this.memory = Float.parseFloat(this.display.getText());
-        return display.getText();
+        String s = new Float(this.memory).toString();
+        this.numberBuffer = s;
+        this.isResult = true; // read from memory, can't change its value
+        return this.numberBuffer;
     } 
     
     /* memory add number and displays it */
     public String memPlus(){
-        this.memory = this.memory + Float.parseFloat(this.display.getText());
-        return Float.toString(this.memory);
+        this.memory = this.memory + Float.parseFloat(this.numberBuffer);
+        this.numberBuffer = new Float(this.memory).toString();
+        this.isResult = true; // read from memory, can't change its value
+        return this.numberBuffer;
     } 
     
     /* memory subtract number and displays it */
     public String memMinus(){
-        this.memory = this.memory - Float.parseFloat(this.display.getText());
-        return Float.toString(this.memory);
+        this.memory = this.memory - Float.parseFloat(this.numberBuffer);
+        this.numberBuffer = new Float(this.memory).toString();
+        this.isResult = true; // read from memory, can't change its value
+        return this.numberBuffer;
     }
 
     /* return a digit */
     public String digit(int digit){
-        return Integer.toString(digit);
+        if(this.isResult){
+            // clear the result
+            this.numberBuffer = Integer.toString(digit);
+            this.isResult = false;
+        }else{
+            // not a result, append value to end, take care "0" case
+            if(this.numberBuffer == null || this.numberBuffer.equals("0")){
+                // initial number buffer should be removed
+                this.numberBuffer = "";
+            }
+            this.numberBuffer += Integer.toString(digit);
+        }
+        return this.numberBuffer;
     }
     
     /* return a decimal point */
     public String decimalPoint(){
-        return ".";
+        if(this.isResult){
+            this.numberBuffer = ".";
+            this.isResult = false;
+        }else{
+            this.numberBuffer += ".";
+        }
+        return this.numberBuffer;
     }
     
-    /* change the operand and operator array list when needed */
-    public void updateOperandRegister(float operand){
-        if(this.operandList.size() >= 2){
-            this.operandList.remove(0); // remove the first element
+    
+    /* helper method 1 -- flush the number buffer and push value into the operand list */
+    public void pushIntoOperandList(float operand){
+        this.operandList.add(new Float(operand));
+        if(this.operandList.size() > 2){
+            this.operandList.remove(0); // remove the oldest operand if size is larger than 2
         }
-        this.operandList.add(new Float(operand)); // put the operand into the array list
+    }
+    
+    /* helper method 2 -- return the newest operand */
+    public float newestOperand(){
+        if(this.operandList.isEmpty()){
+            throw new RuntimeException();
+        }
+        // if operand list is not empty, return the last element in the list
+        return this.operandList.get(this.operandList.size() - 1).floatValue();
     }
     
     /* when user press '+', display won't change while the operand/operator array list changes */
     public String add(){
-        float operand = Float.valueOf(this.display.getText()); 
-        this.updateOperandRegister(operand);
-        operator = "+";
-        return this.display.getText();
+        float operand = Float.parseFloat(this.numberBuffer);
+        this.pushIntoOperandList(operand);
+        this.operator = "+";
+        this.isResult = true;
+        return new Float(operand).toString();
     } 
     
     /* when user press '-', display won't change while the operand/operator array list changes */
     public String subtract(){
-        float operand = Float.valueOf(this.display.getText()); 
-        this.updateOperandRegister(operand);
-        operator = "-";
-        return this.display.getText();
+        float operand = Float.parseFloat(this.numberBuffer);
+        this.pushIntoOperandList(operand);
+        this.operator = "-";
+        this.isResult = true;
+        return new Float(operand).toString();
     }
     
     /* when user press '*', display won't change while the operand/operator array list changes */
     public String multiply(){
-        float operand = Float.valueOf(this.display.getText()); 
-        this.updateOperandRegister(operand);
-        operator = "*";
-        return this.display.getText(); 
+        float operand = Float.parseFloat(this.numberBuffer);
+        this.pushIntoOperandList(operand);
+        this.operator = "*";
+        this.isResult = true;
+        return new Float(operand).toString(); 
     } 
     
     /* when user press '/', display won't change while the operand/operator array list changes */
     public String divide(){
-        float operand = Float.valueOf(this.display.getText()); 
-        this.updateOperandRegister(operand);
-        operator = "/";
-        return this.display.getText();
+        float operand = Float.parseFloat(this.numberBuffer);
+        this.pushIntoOperandList(operand);
+        this.operator = "/";
+        this.isResult = true;
+        return new Float(operand).toString();
     } 
     
     /* when user press '=' */
     public String equals(){
-        if(this.operandList.size() == 0){
-            return "0";
-        }
         if(operator == null){
-            // return the last element in the operand
-            return this.operandList.get(this.operandList.size() - 1).toString();
-        }
-        else{
+            return this.numberBuffer;
+        }else{
+            this.pushIntoOperandList(Float.parseFloat(this.numberBuffer));
+            
             // both operand size and operator are not null
             float cal = 0;
             float operand1 = 0;
             float operand2 = 0;
             if(this.operandList.size() == 1){
-                operand1 = this.operandList.get(0).floatValue();
+                operand1 = this.newestOperand();
                 operand2 = operand1;
             }else{
                 operand1 = this.operandList.get(0).floatValue();
@@ -145,44 +189,49 @@ public class CalculatorChip {
             if(operator.equals("sqrt")){
                 return this.sqrt();
             }
-            this.updateOperandRegister(cal);
-            return new Float(cal).toString();
+            this.numberBuffer = Float.toString(cal);
+            this.isResult = true;
+            return this.numberBuffer;
         }
     }
     
     /* when user press 'sqrt' */
     public String sqrt(){
-        float operand = this.operandList.get(this.operandList.size() - 1);
+        float operand = this.newestOperand();
         float cal = (float)Math.sqrt((double)operand);
-        this.updateOperandRegister(cal);
-        return new Float(cal).toString();
+        this.numberBuffer = Float.toString(cal);
+        this.isResult = true;
+        return this.numberBuffer;
     } 
     
     /* when user press '%' */
     public String percent(){
-        float operand = this.operandList.get(this.operandList.size() - 1);
+        float operand = this.newestOperand();
         float cal = operand/100;
-        this.updateOperandRegister(cal);
-        return new Float(cal).toString();
+        this.numberBuffer = Float.toString(cal);
+        this.isResult = true;
+        return this.numberBuffer;
     } 
     
     /* when user press '1/x' */
     public String invert(){
-        float operand = this.operandList.get(this.operandList.size() - 1);
+        float operand = this.newestOperand();
         if(operand == 0){
             return "Error";
         }
         float cal = 1/operand;
-        this.updateOperandRegister(cal);
-        return new Float(cal).toString();
+        this.numberBuffer = Float.toString(cal);
+        this.isResult = true;
+        return this.numberBuffer;
     } 
     
     /* when user press '+/-' */
     public String changeSign(){
-        float operand = this.operandList.get(this.operandList.size() - 1);
+        float operand = this.newestOperand();
         float cal = -1 * operand;
-        this.updateOperandRegister(cal);
-        return new Float(cal).toString();
+        this.numberBuffer = Float.toString(cal);
+        this.isResult = true;
+        return this.numberBuffer;
     }
     
 }

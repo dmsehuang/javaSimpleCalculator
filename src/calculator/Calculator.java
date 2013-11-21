@@ -6,7 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class Calculator extends JFrame{
-    JTextField cal;
+    JTextField display;
+    CalculatorChip calculatorChip;
 
     /**
      * @param args
@@ -18,6 +19,7 @@ public class Calculator extends JFrame{
 
     public void createGui(){
         CalculatorChip calculatorChip = new CalculatorChip();
+        this.calculatorChip = calculatorChip;
         
         NumberButton button1 = new NumberButton(calculatorChip, "1");
         NumberButton button2 = new NumberButton(calculatorChip, "2");
@@ -38,9 +40,11 @@ public class Calculator extends JFrame{
         OperationButton buttonDiv = new OperationButton(calculatorChip, "/");
         OperationButton buttonPer = new OperationButton(calculatorChip, "%");
         OperationButton buttonInv = new OperationButton(calculatorChip, "1/x");
+        OperationButton buttonSqrt = new OperationButton(calculatorChip, "sqrt");
         OperationButton buttonEql = new OperationButton(calculatorChip, "=");
         
         OperationButton buttonClear = new OperationButton(calculatorChip, "C");
+        OperationButton buttonAllClear = new OperationButton(calculatorChip, "AC");
         
         MemoryButton buttonMC = new MemoryButton(calculatorChip, "MC");
         MemoryButton buttonMR = new MemoryButton(calculatorChip, "MR");
@@ -49,6 +53,7 @@ public class Calculator extends JFrame{
         
         JTextField display = new JTextField(15);
         display.setText("0");
+        this.display = display;
         
         JPanel pMem = new JPanel();
         pMem.setLayout(new BoxLayout(pMem, BoxLayout.X_AXIS));
@@ -61,6 +66,7 @@ public class Calculator extends JFrame{
         pNorth.setLayout(new BoxLayout(pNorth, BoxLayout.Y_AXIS));
         pNorth.add(display);
         pNorth.add(buttonClear);
+        pNorth.add(buttonAllClear);
         pNorth.add(pMem);
         
         JPanel pWest = new JPanel();
@@ -76,6 +82,9 @@ public class Calculator extends JFrame{
         pWest.add(button3);
         pWest.add(button0);
         pWest.add(buttonDot);
+        
+        // sqrt
+        pWest.add(buttonSqrt);
         
         JPanel pOperation = new JPanel();
         pOperation.setLayout(new GridLayout(4,2));
@@ -98,11 +107,70 @@ public class Calculator extends JFrame{
 
         pack();
         setVisible(true);
+        
+        
+        // add number listener
+        button1.addActionListener(new NumberButtonListener());
+        button2.addActionListener(new NumberButtonListener());
+        button3.addActionListener(new NumberButtonListener());
+        button4.addActionListener(new NumberButtonListener());
+        button5.addActionListener(new NumberButtonListener());
+        button6.addActionListener(new NumberButtonListener());
+        button7.addActionListener(new NumberButtonListener());
+        button8.addActionListener(new NumberButtonListener());
+        button9.addActionListener(new NumberButtonListener());
+        button0.addActionListener(new NumberButtonListener());
+        // add dot listener
+        buttonDot.addActionListener(new DotListener());
+        // add operation listener
+        buttonSign.addActionListener(new OperationListener());
+        buttonAdd.addActionListener(new OperationListener());
+        buttonSub.addActionListener(new OperationListener());
+        buttonMul.addActionListener(new OperationListener());
+        buttonDiv.addActionListener(new OperationListener());
+        buttonPer.addActionListener(new OperationListener());
+        buttonInv.addActionListener(new OperationListener());
+        buttonEql.addActionListener(new OperationListener());
     }
     
     class NumberButtonListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
-            cal.setText("hhuijing");
+            String s = calculatorChip.digit(Integer.parseInt(e.getActionCommand()));
+            display.setText(s);
+        }
+    }
+    
+    class DotListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String s = calculatorChip.decimalPoint();
+            display.setText(s);
+        }
+    }
+    
+    class OperationListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String cmd = e.getActionCommand();
+            String s = "";
+            if(cmd.equals("+")){
+                s = calculatorChip.add();
+            }else if(cmd.equals("-")){
+                s = calculatorChip.subtract();
+            }else if(cmd.equals("*")){
+                s = calculatorChip.multiply();
+            }else if(cmd.equals("/")){
+                s = calculatorChip.divide();
+            }else if(cmd.equals("sqrt")){
+                s = calculatorChip.sqrt();
+            }else if(cmd.equals("%")){
+                s = calculatorChip.percent();
+            }else if(cmd.equals("1/x")){
+                s = calculatorChip.invert();
+            }else if(cmd.equals("+/-")){
+                s = calculatorChip.changeSign();
+            }else if(cmd.equals("=")){
+                s = calculatorChip.equals();
+            }
+            display.setText(s);
         }
     }
 }
