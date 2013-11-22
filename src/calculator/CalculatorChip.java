@@ -168,9 +168,6 @@ public class CalculatorChip {
             if(operator.equals("+")){
                 cal = this.operand1 + this.operand2;
             }
-            if(operator.equals("+")){
-                cal = this.operand1 + this.operand2;
-            }
             if(operator.equals("-")){
                 cal = this.operand1 - this.operand2;
             }
