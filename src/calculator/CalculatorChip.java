@@ -8,7 +8,9 @@ public class CalculatorChip {
     float memory; 
     String numberBuffer;
     boolean isResult; // if the display is a result, can't change it
-    ArrayList<Float> operandList; // at most two operands
+    boolean afterEql; // if the display is after a equal key is pressed
+    float operand1;
+    float operand2;
     String operator;
     
     /* constructor for calculator chip */
@@ -16,7 +18,9 @@ public class CalculatorChip {
         this.memory = 0;
         this.numberBuffer = "0";
         this.isResult = false;
-        this.operandList = new ArrayList<Float>();
+        this.afterEql = false;
+        this.operand1 = 0;
+        this.operand2 = 0;
         this.operator = null;
     }
     
@@ -31,7 +35,8 @@ public class CalculatorChip {
     public String allClear(){
         // clear the number buffer, operand list and operator
         this.numberBuffer = "0";
-        this.operandList.clear();
+        this.operand1 = 0;
+        this.operand2 = 0;
         this.operator = null;
         return "0";
     }
@@ -94,28 +99,15 @@ public class CalculatorChip {
         return this.numberBuffer;
     }
     
-    
-    /* helper method 1 -- flush the number buffer and push value into the operand list */
-    public void pushIntoOperandList(float operand){
-        this.operandList.add(new Float(operand));
-        if(this.operandList.size() > 2){
-            this.operandList.remove(0); // remove the oldest operand if size is larger than 2
-        }
-    }
-    
-    /* helper method 2 -- return the newest operand */
-    public float newestOperand(){
-        if(this.operandList.isEmpty()){
-            throw new RuntimeException();
-        }
-        // if operand list is not empty, return the last element in the list
-        return this.operandList.get(this.operandList.size() - 1).floatValue();
-    }
-    
     /* when user press '+', display won't change while the operand/operator array list changes */
     public String add(){
+        if(this.operator != null && !this.afterEql){
+            // if previous calculation is not executed, execute here
+            this.numberBuffer = this.equals();
+            this.afterEql = false; // the equal key is not actually pressed
+        }
         float operand = Float.parseFloat(this.numberBuffer);
-        this.pushIntoOperandList(operand);
+        this.operand1 = operand;
         this.operator = "+";
         this.isResult = true;
         return new Float(operand).toString();
@@ -123,8 +115,13 @@ public class CalculatorChip {
     
     /* when user press '-', display won't change while the operand/operator array list changes */
     public String subtract(){
+        if(this.operator != null && !this.afterEql){
+            // if previous calculation is not executed, execute here
+            this.numberBuffer = this.equals();
+            this.afterEql = false; // the equal key is not actually pressed
+        }
         float operand = Float.parseFloat(this.numberBuffer);
-        this.pushIntoOperandList(operand);
+        this.operand1 = operand;
         this.operator = "-";
         this.isResult = true;
         return new Float(operand).toString();
@@ -132,17 +129,27 @@ public class CalculatorChip {
     
     /* when user press '*', display won't change while the operand/operator array list changes */
     public String multiply(){
+        if(this.operator != null && !this.afterEql){
+            // if previous calculation is not executed, execute here
+            this.numberBuffer = this.equals();
+            this.afterEql = false; // the equal key is not actually pressed
+        }
         float operand = Float.parseFloat(this.numberBuffer);
-        this.pushIntoOperandList(operand);
+        this.operand1 = operand;
         this.operator = "*";
         this.isResult = true;
-        return new Float(operand).toString(); 
+        return new Float(operand).toString();
     } 
     
     /* when user press '/', display won't change while the operand/operator array list changes */
     public String divide(){
+        if(this.operator != null && !this.afterEql){
+            // if previous calculation is not executed, execute here
+            this.numberBuffer = this.equals();
+            this.afterEql = false; // the equal key is not actually pressed
+        }
         float operand = Float.parseFloat(this.numberBuffer);
-        this.pushIntoOperandList(operand);
+        this.operand1 = operand;
         this.operator = "/";
         this.isResult = true;
         return new Float(operand).toString();
@@ -153,51 +160,39 @@ public class CalculatorChip {
         if(operator == null){
             return this.numberBuffer;
         }else{
-            this.pushIntoOperandList(Float.parseFloat(this.numberBuffer));
-            
-            // both operand size and operator are not null
+            float operand = Float.parseFloat(this.numberBuffer);
+            this.operand2 = operand;
             float cal = 0;
-            float operand1 = 0;
-            float operand2 = 0;
-            if(this.operandList.size() == 1){
-                operand1 = this.newestOperand();
-                operand2 = operand1;
-            }else{
-                operand1 = this.operandList.get(0).floatValue();
-                operand2 = this.operandList.get(1).floatValue();
-            }
+ 
             // +, -, *, / requires two operands
             if(operator.equals("+")){
-                cal = operand1 + operand2;
+                cal = this.operand1 + this.operand2;
             }
             if(operator.equals("+")){
-                cal = operand1 + operand2;
+                cal = this.operand1 + this.operand2;
             }
             if(operator.equals("-")){
-                cal = operand1 - operand2;
+                cal = this.operand1 - this.operand2;
             }
             if(operator.equals("*")){
-                cal = operand1 * operand2;
+                cal = this.operand1 * this.operand2;
             }
             if(operator.equals("/")){
-                if(operand2 == 0){
+                if(this.operand2 == 0){
                     return "Error";
                 }
-                cal = operand1 / operand2;
-            }
-            // sqrt requires one operand, here the last one: operand2
-            if(operator.equals("sqrt")){
-                return this.sqrt();
+                cal = this.operand1 / this.operand2;
             }
             this.numberBuffer = Float.toString(cal);
             this.isResult = true;
-            return this.numberBuffer;
+            this.afterEql = true;
+            return Float.toString(cal);
         }
     }
     
     /* when user press 'sqrt' */
     public String sqrt(){
-        float operand = this.newestOperand();
+        float operand = Float.parseFloat(this.numberBuffer);
         float cal = (float)Math.sqrt((double)operand);
         this.numberBuffer = Float.toString(cal);
         this.isResult = true;
@@ -206,7 +201,7 @@ public class CalculatorChip {
     
     /* when user press '%' */
     public String percent(){
-        float operand = this.newestOperand();
+        float operand = Float.parseFloat(this.numberBuffer);
         float cal = operand/100;
         this.numberBuffer = Float.toString(cal);
         this.isResult = true;
@@ -215,7 +210,7 @@ public class CalculatorChip {
     
     /* when user press '1/x' */
     public String invert(){
-        float operand = this.newestOperand();
+        float operand = Float.parseFloat(this.numberBuffer);
         if(operand == 0){
             return "Error";
         }
@@ -227,7 +222,7 @@ public class CalculatorChip {
     
     /* when user press '+/-' */
     public String changeSign(){
-        float operand = this.newestOperand();
+        float operand = Float.parseFloat(this.numberBuffer);
         float cal = -1 * operand;
         this.numberBuffer = Float.toString(cal);
         this.isResult = true;

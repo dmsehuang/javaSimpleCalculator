@@ -1,13 +1,18 @@
 package calculator;
 import java.awt.*;
 import java.awt.event.*;
-//import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
 public class Calculator extends JFrame{
     JTextField display;
     CalculatorChip calculatorChip;
+    public static final String appName = "Calculator";
+	public static final int DEFAULT_WIDTH = 550;
+	public static final int DEFAULT_HEIGHT = 680;
+	
+	private static final int BUTTON_GAP = 5;
+	
 
     /**
      * @param args
@@ -51,59 +56,56 @@ public class Calculator extends JFrame{
         MemoryButton buttonMAdd = new MemoryButton(calculatorChip, "M+");
         MemoryButton buttonMMinus = new MemoryButton(calculatorChip, "M-");
         
-        JTextField display = new JTextField(15);
+        JTextField display = new JTextField();
         display.setText("0");
+		display.setHorizontalAlignment(JTextField.RIGHT);
+		display.setEditable(false);
+		display.setBackground(Color.WHITE);
+		
         this.display = display;
         
         JPanel pMem = new JPanel();
-        pMem.setLayout(new BoxLayout(pMem, BoxLayout.X_AXIS));
+        pMem.setLayout(new GridLayout(5,5, BUTTON_GAP, BUTTON_GAP)); 
         pMem.add(buttonMC);
         pMem.add(buttonMR);
         pMem.add(buttonMAdd);
         pMem.add(buttonMMinus);
-        
+        pMem.add(buttonSqrt);
+        pMem.add(button7);
+        pMem.add(button8);
+        pMem.add(button9);
+        pMem.add(buttonDiv);
+        pMem.add(buttonPer);
+        pMem.add(button4);
+        pMem.add(button5);
+        pMem.add(button6);
+        pMem.add(buttonMul);
+        pMem.add(buttonInv);
+        pMem.add(button1);
+        pMem.add(button2);
+        pMem.add(button3);
+        pMem.add(buttonSub);
+        pMem.add(buttonEql);
+        pMem.add(button0);
+        pMem.add(buttonDot);
+        pMem.add(buttonSign);
+        pMem.add(buttonAdd);
+       
         JPanel pNorth = new JPanel();
         pNorth.setLayout(new BoxLayout(pNorth, BoxLayout.Y_AXIS));
         pNorth.add(display);
-        pNorth.add(buttonClear);
-        pNorth.add(buttonAllClear);
-        pNorth.add(pMem);
         
-        JPanel pWest = new JPanel();
-        pWest.setLayout(new GridLayout(4,4)); 
-        pWest.add(button7);
-        pWest.add(button8);
-        pWest.add(button9);
-        pWest.add(button4);
-        pWest.add(button5);
-        pWest.add(button6);
-        pWest.add(button1);
-        pWest.add(button2);
-        pWest.add(button3);
-        pWest.add(button0);
-        pWest.add(buttonDot);
-        
-        // sqrt
-        pWest.add(buttonSqrt);
-        
-        JPanel pOperation = new JPanel();
-        pOperation.setLayout(new GridLayout(4,2));
-        pOperation.add(buttonSign);
-        pOperation.add(buttonAdd);
-        pOperation.add(buttonSub);
-        pOperation.add(buttonMul);
-        pOperation.add(buttonDiv);
-        pOperation.add(buttonPer);
-        pOperation.add(buttonInv);
-        pOperation.add(buttonEql);
-        
-        JPanel pEast = new JPanel();
-        pEast.add(pOperation);
-        
+        JPanel pCenter = new JPanel();
+        pCenter.setLayout(new  GridLayout(1,2, BUTTON_GAP, BUTTON_GAP)); 
+      
+        pCenter.add(buttonClear);
+        pCenter.add(buttonAllClear);
+       
         setLayout(new BorderLayout());
         add(pNorth, BorderLayout.NORTH);
-        add(pWest, BorderLayout.WEST);
-        add(pEast, BorderLayout.EAST);
+        add(pCenter, BorderLayout.EAST);
+        add(pMem, BorderLayout.SOUTH);
+        
 
         pack();
         setVisible(true);
@@ -131,6 +133,10 @@ public class Calculator extends JFrame{
         buttonPer.addActionListener(new OperationListener());
         buttonInv.addActionListener(new OperationListener());
         buttonEql.addActionListener(new OperationListener());
+        buttonSqrt.addActionListener(new OperationListener());
+        // clear and all clear
+        buttonClear.addActionListener(new OperationListener());
+        buttonAllClear.addActionListener(new OperationListener());
     }
     
     class NumberButtonListener implements ActionListener{
@@ -169,6 +175,10 @@ public class Calculator extends JFrame{
                 s = calculatorChip.changeSign();
             }else if(cmd.equals("=")){
                 s = calculatorChip.equals();
+            }else if(cmd.equals("C")){
+                s = calculatorChip.clear();
+            }else if(cmd.equals("AC")){
+                s = calculatorChip.allClear();
             }
             display.setText(s);
         }
