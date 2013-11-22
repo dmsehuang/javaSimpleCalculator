@@ -8,8 +8,8 @@ public class Calculator extends JFrame{
     JTextField display;
     CalculatorChip calculatorChip;
     public static final String appName = "Calculator";
-	public static final int DEFAULT_WIDTH = 550;
-	public static final int DEFAULT_HEIGHT = 680;
+    public static final int DEFAULT_WIDTH = 315;
+	public static final int DEFAULT_HEIGHT = 400;
 	
 	private static final int BUTTON_GAP = 5;
 	
@@ -108,6 +108,9 @@ public class Calculator extends JFrame{
         
 
         pack();
+        setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+		
+		setResizable(false);
         setVisible(true);
         
         
