@@ -42,10 +42,10 @@ public class Calculator extends JFrame{
         OperationButton buttonAdd = new OperationButton(calculatorChip, "+");
         OperationButton buttonSub = new OperationButton(calculatorChip, "-");
         OperationButton buttonMul = new OperationButton(calculatorChip, "*");
-        OperationButton buttonDiv = new OperationButton(calculatorChip, "/");
+        OperationButton buttonDiv = new OperationButton(calculatorChip, "\u00F7");
         OperationButton buttonPer = new OperationButton(calculatorChip, "%");
         OperationButton buttonInv = new OperationButton(calculatorChip, "1/x");
-        OperationButton buttonSqrt = new OperationButton(calculatorChip, "sqrt");
+        OperationButton buttonSqrt = new OperationButton(calculatorChip, "\u221A");
         OperationButton buttonEql = new OperationButton(calculatorChip, "=");
         
         OperationButton buttonClear = new OperationButton(calculatorChip, "C");
@@ -137,6 +137,12 @@ public class Calculator extends JFrame{
         // clear and all clear
         buttonClear.addActionListener(new OperationListener());
         buttonAllClear.addActionListener(new OperationListener());
+        
+        // add memory operation listener
+        buttonMC.addActionListener(new MemoryListener());
+        buttonMR.addActionListener(new MemoryListener());
+        buttonMAdd.addActionListener(new MemoryListener());
+        buttonMMinus.addActionListener(new MemoryListener());
     }
     
     class NumberButtonListener implements ActionListener{
@@ -153,6 +159,23 @@ public class Calculator extends JFrame{
         }
     }
     
+    class MemoryListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String cmd = e.getActionCommand();
+            String s = "";
+            if(cmd.equals("MC")){
+                s = calculatorChip.memClear();
+            }else if(cmd.equals("MR")){
+                s = calculatorChip.memRead();
+            }else if(cmd.equals("M+")){
+                s = calculatorChip.memPlus();
+            }else if(cmd.equals("M-")){
+                s = calculatorChip.memMinus();
+            }
+            display.setText(s);
+        }
+    }
+    
     class OperationListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             String cmd = e.getActionCommand();
@@ -163,9 +186,9 @@ public class Calculator extends JFrame{
                 s = calculatorChip.subtract();
             }else if(cmd.equals("*")){
                 s = calculatorChip.multiply();
-            }else if(cmd.equals("/")){
+            }else if(cmd.equals("\u00F7")){
                 s = calculatorChip.divide();
-            }else if(cmd.equals("sqrt")){
+            }else if(cmd.equals("\u221A")){
                 s = calculatorChip.sqrt();
             }else if(cmd.equals("%")){
                 s = calculatorChip.percent();
@@ -184,10 +207,3 @@ public class Calculator extends JFrame{
         }
     }
 }
-
-class MyOkButtonListener implements ActionListener{
-    public void actionPerformed(ActionEvent e){
-        System.out.println("click");
-    }
-}
-

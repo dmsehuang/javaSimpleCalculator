@@ -150,7 +150,7 @@ public class CalculatorChip {
         }
         float operand = Float.parseFloat(this.numberBuffer);
         this.operand1 = operand;
-        this.operator = "/";
+        this.operator = "\u00F7";
         this.isResult = true;
         return new Float(operand).toString();
     } 
@@ -177,7 +177,7 @@ public class CalculatorChip {
             if(operator.equals("*")){
                 cal = this.operand1 * this.operand2;
             }
-            if(operator.equals("/")){
+            if(operator.equals("\u00F7")){
                 if(this.operand2 == 0){
                     return "Error";
                 }
